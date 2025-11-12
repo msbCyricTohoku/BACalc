@@ -4,6 +4,9 @@
 BACalc Biological Age Program wirrten in Python Qt:
 **PCA > BAS > T-scale > Dubina-corrected BAc**
 
+## Screenshot
+![App Screenshot](screen.png)
+
 ## Features
 - Load/merge multiple CSVs
 - Choose age column and an optional binary split column

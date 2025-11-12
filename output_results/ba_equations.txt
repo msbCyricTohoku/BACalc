@@ -1,0 +1,30 @@
+========================================================================================
+Group: Male=0
+T-scale: alpha=7.770405232, beta=71.69494949   (BA = alpha*BAS + beta)
+Dubina : gamma=0.9475754869, mu_CA=71.69494949 (BAc = BA + (CA - mu_CA)*gamma)
+Dataset stats used: bas_mu=3.014423727e-16, bas_sd=1.478019569, ca_mean=71.69494949, ca_sd=11.48481099, b=0.05242451307
+
+BAS (raw linear form):
+  BAS_Male=0 = 4.368818323 + (-0.005623319814*Heart_Rate) + (-0.1792237719*WBC(10^9/L)) + (-0.0877330661*RBC(10^12/L)) + (-0.1851410853*Neutrophils(10^9/L)) + (-0.004893303201*Platelets(10^9/L))
+
+BA (expanded from T-scale):
+  BA_Male=0 = 105.6424383 + (-0.04369547371*Heart_Rate) + (-1.392641335*WBC(10^9/L)) + (-0.6817214759*RBC(10^12/L)) + (-1.438621258*Neutrophils(10^9/L)) + (-0.0380229488*Platelets(10^9/L))
+
+BAc (expanded from Dubina correction):
+  BAc_Male=0 = 37.70606157 + (0.9475754869*CA) + (-0.04369547371*Heart_Rate) + (-1.392641335*WBC(10^9/L)) + (-0.6817214759*RBC(10^12/L)) + (-1.438621258*Neutrophils(10^9/L)) + (-0.0380229488*Platelets(10^9/L))
+
+========================================================================================
+Group: Male=1
+T-scale: alpha=8.609412259, beta=65.57651642   (BA = alpha*BAS + beta)
+Dubina : gamma=0.7937668091, mu_CA=65.57651642 (BAc = BA + (CA - mu_CA)*gamma)
+Dataset stats used: bas_mu=5.298426633e-16, bas_sd=1.48566452, ca_mean=65.57651642, ca_sd=12.79069833, b=0.2062331909
+
+BAS (raw linear form):
+  BAS_Male=1 = 5.593489952 + (-0.0101574985*Heart_Rate) + (-0.1961310868*WBC(10^9/L)) + (-0.2060884059*RBC(10^12/L)) + (-0.2052773044*Neutrophils(10^9/L)) + (-0.005205373371*Platelets(10^9/L))
+
+BA (expanded from T-scale):
+  BA_Male=1 = 113.7331774 + (-0.08745009209*Heart_Rate) + (-1.688573383*WBC(10^9/L)) + (-1.774300048*RBC(10^12/L)) + (-1.767316941*Neutrophils(10^9/L)) + (-0.04481520531*Platelets(10^9/L))
+
+BAc (expanded from Dubina correction):
+  BAc_Male=1 = 61.68071519 + (0.7937668091*CA) + (-0.08745009209*Heart_Rate) + (-1.688573383*WBC(10^9/L)) + (-1.774300048*RBC(10^12/L)) + (-1.767316941*Neutrophils(10^9/L)) + (-0.04481520531*Platelets(10^9/L))
+
