@@ -21,8 +21,8 @@ def zscore(X: np.ndarray):
     mu = np.nanmean(X, axis=0)
     sd = np.nanstd(X, axis=0, ddof=0)
     sd = np.where(sd == 0, 1.0, sd)
-    Z_values = (X - mu) / sd
-    return Z_values, mu, sd
+    z_values = (X - mu) / sd
+    return z_values, mu, sd
 
 
 def t_scale(bas: np.ndarray, ca: np.ndarray, ddof: int = 0):
@@ -153,17 +153,17 @@ def run_ba_pipeline(
             sub[c] = sub[c].fillna(med)
 
         X = sub[biom_cols].to_numpy(dtype=float)
-        Z_values, mu_x, sd_x = zscore(X)
+        z_values, mu_x, sd_x = zscore(X)
 
         # pca and select PC1
         pca = PCA(n_components=1, svd_solver="full")
-        pca.fit(Z_values)
+        pca.fit(z_values)
         pc1 = pca.components_[0].copy()
 
         ca = sub[age_col].to_numpy(dtype=float)
 
         # align sign so PC1 increases with age
-        r = np.corrcoef(Z_values @ pc1, ca)[0, 1]
+        r = np.corrcoef(z_values @ pc1, ca)[0, 1]
         if np.isnan(r):
             r = 1.0
         if r < 0:
