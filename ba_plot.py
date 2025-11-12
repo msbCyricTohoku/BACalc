@@ -10,10 +10,12 @@ import matplotlib.pyplot as plt
 
 
 def sanitize_for_filename(s: str) -> str:
+    """for filename sanitization"""
     return re.sub(r"[^A-Za-z0-9._-]+", "_", s)
 
 
 def plot_ba_results(pred_csv: Path, out_dir: Path, log=print):
+    """main function for plotting ba results"""
     out_dir = Path(out_dir)
     plots_dir = out_dir / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)
