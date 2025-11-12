@@ -4,7 +4,8 @@ from pathlib import Path
 import re
 import numpy as np
 import pandas as pd
-import matplotlib
+
+# import matplotlib
 import matplotlib.pyplot as plt
 
 
@@ -50,7 +51,7 @@ def plot_ba_results(pred_csv: Path, out_dir: Path, log=print):
     group_plots = []
     if "Group" in df.columns:
         for g in df["Group"].unique():
-            sub = df[df["Group"] == g]
+            # sub = df[df["Group"] == g]
             tag = sanitize_for_filename(str(g))
             group_plots.append(
                 plot_xy("Age", "BA", f"BA vs Age — {g}", f"plot_ba_vs_age_{tag}.png")
