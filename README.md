@@ -29,3 +29,6 @@ python app.py
 ```
 
 The BACalc writes outputs to the chosen "Output directory" (default: `./output_results`).
+
+## Windows Exe Release
+Users running Windows 64 operating system can download our exe builds for a simple and easy run.

@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 
-def _sanitize_for_filename(s: str) -> str:
+def sanitize_for_filename(s: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", s)
 
 
@@ -21,7 +21,7 @@ def plot_ba_results(pred_csv: Path, out_dir: Path, log=print):
     if not {"Age", "BA", "BAc"}.issubset(df.columns):
         raise ValueError("Predictions file lacks needed columns (Age, BA, BAc).")
 
-    def _plot_xy(x, y, title, fname):
+    def plot_xy(x, y, title, fname):
         plt.figure()
         groups = df["Group"].unique() if "Group" in df.columns else ["All"]
         for g in groups:
@@ -44,21 +44,19 @@ def plot_ba_results(pred_csv: Path, out_dir: Path, log=print):
         log(f"Saved plot: {outp}")
         return outp
 
-    ba_all = _plot_xy("Age", "BA", "BA vs Age (All Groups)", "plot_ba_vs_age.png")
-    bac_all = _plot_xy("Age", "BAc", "BAc vs Age (All Groups)", "plot_bac_vs_age.png")
+    ba_all = plot_xy("Age", "BA", "BA vs Age (All Groups)", "plot_ba_vs_age.png")
+    bac_all = plot_xy("Age", "BAc", "BAc vs Age (All Groups)", "plot_bac_vs_age.png")
 
     group_plots = []
     if "Group" in df.columns:
         for g in df["Group"].unique():
             sub = df[df["Group"] == g]
-            tag = _sanitize_for_filename(str(g))
+            tag = sanitize_for_filename(str(g))
             group_plots.append(
-                _plot_xy("Age", "BA", f"BA vs Age — {g}", f"plot_ba_vs_age_{tag}.png")
+                plot_xy("Age", "BA", f"BA vs Age — {g}", f"plot_ba_vs_age_{tag}.png")
             )
             group_plots.append(
-                _plot_xy(
-                    "Age", "BAc", f"BAc vs Age — {g}", f"plot_bac_vs_age_{tag}.png"
-                )
+                plot_xy("Age", "BAc", f"BAc vs Age — {g}", f"plot_bac_vs_age_{tag}.png")
             )
 
     return {
