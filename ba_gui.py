@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# pylint: disable=no-name-in-module
 from pathlib import Path
 from typing import List
 
