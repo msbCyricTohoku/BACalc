@@ -10,20 +10,23 @@ EPS = 1e-12
 
 
 def to_numeric(df: pd.DataFrame, cols) -> None:
+    """change values to numeric"""
     for c in cols:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
 
 def zscore(X: np.ndarray):
+    """computes zscore here"""
     mu = np.nanmean(X, axis=0)
     sd = np.nanstd(X, axis=0, ddof=0)
     sd = np.where(sd == 0, 1.0, sd)
-    Z = (X - mu) / sd
-    return Z, mu, sd
+    Z_values = (X - mu) / sd
+    return Z_values, mu, sd
 
 
 def t_scale(bas: np.ndarray, ca: np.ndarray, ddof: int = 0):
+    """performs t-scale calculations"""
     bas_mu = np.nanmean(bas)
     bas_sd = np.nanstd(bas, ddof=ddof) or 1.0
     ca_mu = np.nanmean(ca)
@@ -32,6 +35,7 @@ def t_scale(bas: np.ndarray, ca: np.ndarray, ddof: int = 0):
 
 
 def dubina_correct(BA: np.ndarray, CA: np.ndarray):
+    """performs dubina correction here"""
     ca_mean = np.nanmean(CA)
     var_ca = np.nanvar(CA, ddof=0) + EPS
     cov_ba_ca = np.nanmean((BA - np.nanmean(BA)) * (CA - ca_mean))
@@ -110,6 +114,7 @@ def run_ba_pipeline(
     out_dir: Path,
     log=print,
 ):
+    """uses all function to run the BA calculations aka pipeline"""
     out_dir.mkdir(parents=True, exist_ok=True)
 
     to_numeric(df, [age_col] + biom_cols + ([split_col] if split_col else []))
@@ -148,17 +153,17 @@ def run_ba_pipeline(
             sub[c] = sub[c].fillna(med)
 
         X = sub[biom_cols].to_numpy(dtype=float)
-        Z, mu_x, sd_x = zscore(X)
+        Z_values, mu_x, sd_x = zscore(X)
 
         # pca and select PC1
         pca = PCA(n_components=1, svd_solver="full")
-        pca.fit(Z)
+        pca.fit(Z_values)
         pc1 = pca.components_[0].copy()
 
         ca = sub[age_col].to_numpy(dtype=float)
 
         # align sign so PC1 increases with age
-        r = np.corrcoef(Z @ pc1, ca)[0, 1]
+        r = np.corrcoef(Z_values @ pc1, ca)[0, 1]
         if np.isnan(r):
             r = 1.0
         if r < 0:
