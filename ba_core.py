@@ -16,12 +16,12 @@ def to_numeric(df: pd.DataFrame, cols) -> None:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
 
-def zscore(X: np.ndarray):
+def zscore(x_array: np.ndarray):
     """computes zscore here"""
-    mu = np.nanmean(X, axis=0)
-    sd = np.nanstd(X, axis=0, ddof=0)
+    mu = np.nanmean(x_array, axis=0)
+    sd = np.nanstd(x_array, axis=0, ddof=0)
     sd = np.where(sd == 0, 1.0, sd)
-    z_values = (X - mu) / sd
+    z_values = (x_array - mu) / sd
     return z_values, mu, sd
 
 
@@ -152,8 +152,8 @@ def run_ba_pipeline(
             med = float(np.nanmedian(sub[c]))
             sub[c] = sub[c].fillna(med)
 
-        X = sub[biom_cols].to_numpy(dtype=float)
-        z_values, mu_x, sd_x = zscore(X)
+        x_array = sub[biom_cols].to_numpy(dtype=float)
+        z_values, mu_x, sd_x = zscore(x_array)
 
         # pca and select PC1
         pca = PCA(n_components=1, svd_solver="full")
@@ -171,7 +171,7 @@ def run_ba_pipeline(
 
         wn = pc1 / sd_x
         w0 = float(-np.sum(wn * mu_x))
-        BAS = X.dot(wn) + w0
+        BAS = x_array.dot(wn) + w0
 
         # T-scale
         ca_mean = float(np.nanmean(ca))
