@@ -350,7 +350,7 @@ class BAGui(QMainWindow):
             "About",
             "Dynamic and Dataset Agnostic Biological Age Calculator (BACalc)\n"
             "PCA > BAS > T-scale > Dubina-corrected BAc\n\n"
-            "Developed by Mehrdad S. Beni and Gary Tse -- 2025",
+            "Developed by Mehrdad S. Beni, Haipeng Liu and Gary Tse -- 2025",
         )
 
     def log(self, msg: str):
