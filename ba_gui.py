@@ -13,7 +13,6 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QMessageBox,
     QListWidget,
-    #    QListWidgetItem,
     QComboBox,
     QCheckBox,
     QTextEdit,
@@ -21,7 +20,6 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QGridLayout,
-    #    QVBoxLayout,
     QHBoxLayout,
     QGroupBox,
     QAbstractItemView,
@@ -34,9 +32,9 @@ from ba_plot import plot_ba_results
 class BAGui(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("BACalc")
-        self.resize(1000, 700)
-        self.setMinimumSize(920, 620)
+        self.setWindowTitle("BACalc - Advanced")
+        self.resize(1050, 750)
+        self.setMinimumSize(950, 650)
 
         self.files: List[Path] = []
         self.df: pd.DataFrame | None = None
@@ -67,7 +65,7 @@ class BAGui(QMainWindow):
         self.chk_save_plots.setChecked(True)
 
         self.btn_run = QPushButton("Run BA Estimation")
-        self.btn_plot = QPushButton("Plot Results")
+        self.btn_plot = QPushButton("Re-Plot Results")
 
         self.log_box = QTextEdit()
         self.log_box.setReadOnly(True)
@@ -296,6 +294,7 @@ class BAGui(QMainWindow):
 
             split = self.split_box.currentText().strip() or None
 
+            self.log("Starting pipeline...")
             outputs = run_ba_pipeline(
                 df=df_run,
                 age_col=age,
@@ -310,7 +309,7 @@ class BAGui(QMainWindow):
                 self.log(f"  {k}: {p}")
 
             if self.chk_save_plots.isChecked():
-                self.log("\nGenerating plots...")
+                self.log("\nGenerating advanced plots...")
                 plot_info = plot_ba_results(
                     outputs["predictions"],
                     Path(self.out_edit.text()).expanduser(),
@@ -323,6 +322,10 @@ class BAGui(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
             self.log(f"ERROR: {e}")
+            # print traceback for debugging
+            import traceback
+
+            traceback.print_exc()
 
     def plot_results(self):
         try:

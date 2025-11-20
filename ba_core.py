@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from scipy import stats
 
 EPS = 1e-12
@@ -51,14 +52,7 @@ def dubina_correct(BA: np.ndarray, CA: np.ndarray):
 def write_equations_txt(
     out_path, group, biom_cols, wn, w0, bas_mu, bas_sd, ca_mean, ca_sd, b
 ):
-    """
-    BA  = alpha * BAS + beta
-    BAc = BA + (CA - mu_ca) * gamma
-
-    BAS_g = w0 + sum(w_i * x_i)
-    BA_g  = (beta + alpha*w0) + sum((alpha*w_i) * x_i)
-    BAc_g = (beta + alpha*w0 - gamma*mu_ca) + gamma*CA + sum((alpha*w_i) * x_i)
-    """
+    """Writes the linear equations to a text file."""
     alpha = ca_sd / (bas_sd if bas_sd != 0 else 1.0)
     beta = ca_mean - alpha * bas_mu
     gamma = 1.0 - b
@@ -71,7 +65,7 @@ def write_equations_txt(
     lines.append("=" * 88)
     lines.append(f"Group: {group}")
     lines.append(
-        f"T-scale: alpha={alpha:.10g}, beta={beta:.10g}   (BA = alpha*BAS + beta)"
+        f"T-scale: alpha={alpha:.10g}, beta={beta:.10g}    (BA = alpha*BAS + beta)"
     )
     lines.append(
         f"Dubina : gamma={gamma:.10g}, mu_CA={mu_ca:.10g} (BAc = BA + (CA - mu_CA)*gamma)"
@@ -101,9 +95,41 @@ def write_equations_txt(
     lines.append("")
 
     out_path = Path(out_path)
-    # write to txt file
     with out_path.open("a", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
+
+
+def calculate_stats(df_res: pd.DataFrame, group_name: str):
+    """Calculates R2, RMSE, MAE, Pearson r for BA and BAc."""
+    stats_list = []
+    for metric in ["BA", "BAc"]:
+        y_true = df_res["Age"]
+        y_pred = df_res[metric]
+
+        # Remove NaNs for calc
+        mask = ~np.isnan(y_true) & ~np.isnan(y_pred)
+        y_t, y_p = y_true[mask], y_pred[mask]
+
+        if len(y_t) < 2:
+            continue
+
+        r2 = r2_score(y_t, y_p)
+        rmse = np.sqrt(mean_squared_error(y_t, y_p))
+        mae = mean_absolute_error(y_t, y_p)
+        pearson_r, _ = stats.pearsonr(y_t, y_p)
+
+        stats_list.append(
+            {
+                "Group": group_name,
+                "Metric_Type": metric,
+                "R2": r2,
+                "Pearson_r": pearson_r,
+                "RMSE": rmse,
+                "MAE": mae,
+                "N": len(y_t),
+            }
+        )
+    return stats_list
 
 
 def run_ba_pipeline(
@@ -136,6 +162,7 @@ def run_ba_pipeline(
     pred_rows = []
     load_rows = []
     coef_rows = []
+    stats_rows = []
 
     eq_path = out_dir / "ba_equations.txt"
     if eq_path.exists():
@@ -197,19 +224,21 @@ def run_ba_pipeline(
         )
 
         # outputs
-        pred_rows.append(
-            pd.DataFrame(
-                {
-                    "Group": gname,
-                    "Age": ca,
-                    "BA": BA,
-                    "BAc": BAc,
-                    "Accel": BA - ca,
-                    "Accel_corr": BAc - ca,
-                },
-                index=sub.index,
-            )
+        sub_res = pd.DataFrame(
+            {
+                "Group": gname,
+                "Age": ca,
+                "BA": BA,
+                "BAc": BAc,
+                "Accel": BA - ca,
+                "Accel_corr": BAc - ca,
+            },
+            index=sub.index,
         )
+        pred_rows.append(sub_res)
+
+        # Stats
+        stats_rows.extend(calculate_stats(sub_res, gname))
 
         load_rows.extend(
             {
@@ -230,7 +259,7 @@ def run_ba_pipeline(
             {"Group": gname, "variable": "intercept_w0", "coef_w": float(w0)}
         )
 
-        log(f"Finished group '{gname}': n={len(sub)}, b={b:.5g}, bas_sd={bas_sd:.5g}")
+        log(f"Finished group '{gname}': n={len(sub)}, b={b:.5g}")
 
     if not pred_rows:
         raise ValueError(
@@ -241,14 +270,17 @@ def run_ba_pipeline(
     pred_path = out_dir / "ba_predictions.csv"
     load_path = out_dir / "pca_loadings.csv"
     coef_path = out_dir / "ba_coefficients.csv"
+    stats_path = out_dir / "ba_stats.csv"
 
     pd.DataFrame(load_rows).to_csv(load_path, index=False)
     pd.DataFrame(coef_rows).to_csv(coef_path, index=False)
+    pd.DataFrame(stats_rows).to_csv(stats_path, index=False)
     res.to_csv(pred_path, index=False)
 
     return {
         "predictions": pred_path,
         "loadings": load_path,
         "coefs": coef_path,
+        "stats": stats_path,
         "equations": eq_path,
     }
