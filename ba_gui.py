@@ -352,7 +352,7 @@ class BAGui(QMainWindow):
             self,
             "About",
             "Dynamic and Dataset Agnostic Biological Age Calculator (BACalc)\n"
-            "PCA > BAS > T-scale > Dubina-corrected BAc\n\n"
+            "PCA > BAS > T-scale > Dubina-corrected BAc and KDM Estimation\n\n"
             "Developed by Mehrdad S. Beni, Haipeng Liu and Gary Tse -- 2025",
         )
 

@@ -2,7 +2,7 @@
 # BACalc (Qt Version)
 
 BACalc Biological Age Program wirrten in Python Qt:
-**PCA > BAS > T-scale > Dubina-corrected BAc**
+**PCA > BAS > T-scale > Dubina-corrected BAc and KDM Estimation**
 
 ## Screenshot
 ![App Screenshot](screen.png)
@@ -12,12 +12,11 @@ BACalc Biological Age Program wirrten in Python Qt:
 - Choose age column and an optional binary split column
 - Select biomarker columns (multi-select, use CTRL+Click)
 - Optional MAP computation from `Systolic_BP` and `Diastolic_BP`
-- Runs the full pipeline:
-  - Z-score > PCA (PC1) > BAS
-  - T-scale to chronological age (CA)
-  - Dubina correction to remove CA correlation
+- Runs two full pipeline:
+  - Method 1: Runs PCA-Dubina.
+  - Method 2: Runs KDM.
 - Saves: `ba_predictions.csv`, `pca_loadings.csv`, `ba_coefficients.csv`, `ba_equations.txt`
-- Generates scatter plots: Age vs BA, Age vs BAc (global + per-group)
+- Generates global + per-group plots
 
 ## Quick start
 ```bash
