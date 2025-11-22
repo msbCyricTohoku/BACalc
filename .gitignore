@@ -18,6 +18,7 @@ jmir/
 *.png
 *.txt
 
+results-BACalc/
 # Unit test / coverage reports
 .coverage
 htmlcov/

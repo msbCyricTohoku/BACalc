@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+# Developed by Mehrdad S. Beni, Haipeng Liu, Gary Tse at HKMU, Hong Kong - 2025
+# Distributed under GPL V3 license, THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+# Please see LICENSE file in the program repository
+
 from pathlib import Path
 import numpy as np
 import pandas as pd
