@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import scipy.stats as stats
-
+from sklearn.metrics import r2_score
 
 def sanitize_for_filename(s: str) -> str:
     """for filename sanitization"""
@@ -50,7 +50,8 @@ def add_regression_stats(ax, x, y, line_color="red", fill_color="red"):
         return
 
     slope, intercept, r_value, p_value, std_err = stats.linregress(x_clean, y_clean)
-    r2 = r_value**2
+    #r2 = r_value**2
+    r2 = r2_score(x_clean, y_clean)
 
     x_seq = np.linspace(x_clean.min(), x_clean.max(), 100)
     y_seq = slope * x_seq + intercept
