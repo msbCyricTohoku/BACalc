@@ -53,6 +53,10 @@ class BAGui(QMainWindow):
 
         self.age_box = QComboBox()
         self.split_box = QComboBox()
+
+        self.impute_box = QComboBox()
+        self.impute_box.addItems(["Median", "Mean", "KNN (k=5)", "Iterative (MICE)"])
+
         self.chk_map = QCheckBox(
             "Compute MAP from Systolic_BP and Diastolic_BP (creates 'MAP')"
         )
@@ -119,11 +123,14 @@ class BAGui(QMainWindow):
         mid.addWidget(QLabel("Optional binary split column:"), 1, 0)
         mid.addWidget(self.split_box, 1, 1)
 
-        mid.addWidget(self.chk_map, 2, 0, 1, 2)
+        mid.addWidget(QLabel("Missing Data Imputation:"), 2, 0)
+        mid.addWidget(self.impute_box, 2, 1)
 
-        mid.addWidget(QLabel("Biomarker columns (multi-select):"), 3, 0, 1, 2)
-        mid.addWidget(self.biom_list, 4, 0, 1, 2)
-        mid.setRowStretch(4, 1)
+        mid.addWidget(self.chk_map, 3, 0, 1, 2)
+
+        mid.addWidget(QLabel("Biomarker columns (multi-select):"), 4, 0, 1, 2)
+        mid.addWidget(self.biom_list, 5, 0, 1, 2)
+        mid.setRowStretch(5, 1)
 
         # output and run in the gui
         grp_bot = QGroupBox("3) Output, Plots & Actions")
@@ -298,13 +305,17 @@ class BAGui(QMainWindow):
 
             split = self.split_box.currentText().strip() or None
 
-            self.log("Starting pipeline...")
+            impute_choice = self.impute_box.currentText()
+
+            #self.log("Starting pipeline...")
+            self.log(f"Starting pipeline using {impute_choice} imputation...")
             outputs = run_ba_pipeline(
                 df=df_run,
                 age_col=age,
                 biom_cols=biom_cols,
                 split_col=split,
                 out_dir=Path(self.out_edit.text()).expanduser(),
+                impute_method=impute_choice,
                 log=self.log,
             )
 

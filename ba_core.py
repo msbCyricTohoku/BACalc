@@ -11,6 +11,10 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from scipy import stats
+from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
 
 EPS = 1e-12
 MIN_S_VALUE = 1e-6
@@ -143,6 +147,8 @@ def train_kdm_params(df_sub, age_col, biom_cols):
 
     s2_ba = max(S2_BA_FLOOR, term1 - term2)
 
+
+
     return {
         "k": k_vals,
         "q": q_vals,
@@ -151,7 +157,6 @@ def train_kdm_params(df_sub, age_col, biom_cols):
         "r_char": r_char,
         "s2_ba": s2_ba,
     }
-
 
 def calculate_kdm_scores(row, biom_cols, params, ca_val):
     """Calculates BA_E and BA_EC for a single row"""
@@ -183,7 +188,6 @@ def calculate_kdm_scores(row, biom_cols, params, ca_val):
     ba_ec = num_ec / den_ec
 
     return ba_e, ba_ec
-
 
 def write_combined_equations(
     out_path, group, biom_cols, wn, w0, bas_mu, bas_sd, ca_mean, ca_sd, b, kdm_params
@@ -309,6 +313,7 @@ def run_ba_pipeline(
     biom_cols: list[str],
     split_col: str | None,
     out_dir: Path,
+    impute_method: str = "Median",
     log=print,
 ):
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -339,9 +344,29 @@ def run_ba_pipeline(
             log(f"Group '{gname}' insufficient data, skipping.")
             continue
 
+
+        log(f"Applying {impute_method} imputation for group '{gname}'...")
+        if impute_method == "Mean":
+            imputer = SimpleImputer(strategy='mean')
+            sub.loc[:, biom_cols] = imputer.fit_transform(sub[biom_cols])
+
+        elif impute_method == "KNN (k=5)":
+            imputer = KNNImputer(n_neighbors=5, weights="uniform")
+            sub.loc[:, biom_cols] = imputer.fit_transform(sub[biom_cols])
+
+        elif impute_method == "Iterative (MICE)":
+            # MICE uses BayesianRidge by default in sklearn
+            imputer = IterativeImputer(random_state=42, max_iter=10)
+            sub.loc[:, biom_cols] = imputer.fit_transform(sub[biom_cols])
+
+        else:
+            # Default to Median
+            imputer = SimpleImputer(strategy='median')
+            sub.loc[:, biom_cols] = imputer.fit_transform(sub[biom_cols])
+
         # Median impute
-        for c in biom_cols:
-            sub[c] = sub[c].fillna(sub[c].median())
+        #for c in biom_cols:
+        #    sub[c] = sub[c].fillna(sub[c].median())
 
         # --- METHOD 1: PCA-Dubina ---
         x_array = sub[biom_cols].to_numpy(dtype=float)
