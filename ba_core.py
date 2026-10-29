@@ -100,7 +100,7 @@ def train_kdm_params(df_sub, age_col, biom_cols):
             continue
         sqrt_term = np.sqrt(1 - r**2)
         num += (r**2) / sqrt_term
-        den += r / sqrt_term
+        den += abs(r) / sqrt_term
 
     r_char = (num / den) if abs(den) > 1e-9 else 0.0
     r_char = np.clip(r_char, -0.9999, 0.9999)
