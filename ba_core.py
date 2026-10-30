@@ -145,7 +145,8 @@ def train_kdm_params(df_sub, age_col, biom_cols):
     except:
         term2 = 0
 
-    s2_ba = max(S2_BA_FLOOR, term1 - term2)
+    #s2_ba = max(S2_BA_FLOOR, term1 - term2)
+    s2_ba = (term1 - term2) if (term1 - term2) > S2_BA_FLOOR else var_ca_approx
 
 
 
