@@ -1,4 +1,4 @@
-
+  
 # BACalc (Qt Version)
 
 BACalc Biological Age Program wirrten in Python Qt:
@@ -32,7 +32,7 @@ python app.py
 
 The BACalc writes outputs to the chosen "Output directory" (default: `./output_results`).
 
-## Bug Fixes (KDM Implementation)
-- **Unsigned correlation (`|r|`) in r<sub>char</sub>:** Use `abs(r)` instead of signed *r* in the denominator so negatively correlated biomarkers do not reduce it, eliminating a ~2-year bias to match R's `BioAge` package.
-- **Dynamic variance floor (s²<sub>BA</sub>):** Fall back to empirical chronological age variance (`var_ca_approx`) instead of a hardcoded `0.1` clamp when variance drops below zero, preventing variance collapse and restoring Cox model convergence.
+## New additions
+- **Unsigned correlation (`|r|`) in r<sub>char</sub>:** Use `abs(r)` instead of signed *r* in the denominator.
+- **Dynamic variance floor (s²<sub>BA</sub>):** Fall back to empirical chronological age variance (`var_ca_approx`).
 - **Reference agreement:** Biological Age estimates now closely align with reference implementations.
