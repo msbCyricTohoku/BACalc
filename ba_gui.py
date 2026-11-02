@@ -31,6 +31,8 @@ from PySide6.QtWidgets import (
 
 from ba_core import run_ba_pipeline
 from ba_plot import plot_ba_results
+from ba_core2 import run_ba_pipeline2
+from ba_plot import plot_ba_results2
 
 
 class BAGui(QMainWindow):
@@ -319,6 +321,16 @@ class BAGui(QMainWindow):
                 log=self.log,
             )
 
+            outputs2 = run_ba_pipeline2(
+                df=df_run,
+                age_col=age,
+                biom_cols=biom_cols,
+                split_col=split,
+                out_dir=Path(self.out_edit.text()).expanduser(),
+                impute_method=impute_choice,
+                log=self.log,
+            )
+
             self.log("\nSaved files:")
             for k, p in outputs.items():
                 self.log(f"  {k}: {p}")
@@ -330,6 +342,13 @@ class BAGui(QMainWindow):
                     Path(self.out_edit.text()).expanduser(),
                     log=self.log,
                 )
+
+                plot_info2 = plot_ba_results2(
+                    outputs2["predictions"],
+                    Path(self.out_edit.text()).expanduser(),
+                    log=self.log,
+                )
+                
                 self.log(f"Plots saved under: {plot_info['plots_dir']}")
 
             QMessageBox.information(self, "Done", "BA estimation complete.")
@@ -354,10 +373,33 @@ class BAGui(QMainWindow):
             plot_info = plot_ba_results(
                 pred_csv, Path(self.out_edit.text()).expanduser(), log=self.log
             )
+
             self.log(f"Plots saved under: {plot_info['plots_dir']}")
             QMessageBox.information(
                 self, "Plots saved", f"Plots saved to:\n{plot_info['plots_dir']}"
             )
+
+            
+
+            
+            pred_csv2 = Path(self.out_edit.text()).expanduser() / "ba_predictions_signed.csv"
+            if not pred_csv2.exists():
+                QMessageBox.warning(
+                    self, "Not found", f"Could not find {pred_csv2}. Run BA first."
+                )
+                return
+
+            self.log("\nGenerating plots 2 from existing predictions...")
+            plot_info2 = plot_ba_results2(
+                pred_csv2, Path(self.out_edit.text()).expanduser(), log=self.log
+            )
+
+            self.log(f"Plots 2  saved under: {plot_info2['plots_dir']}")
+            QMessageBox.information(
+                self, "Plots saved", f"Plots saved to:\n{plot_info2['plots_dir']}"
+            )
+
+            
         except Exception as e:
             QMessageBox.critical(self, "Plot error", str(e))
             self.log(f"ERROR (plot): {e}")

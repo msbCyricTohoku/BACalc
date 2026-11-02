@@ -178,7 +178,7 @@ def plot_ba_results(pred_csv: Path, out_dir: Path, log=print):
         raise ValueError(f"Predictions file lacks needed columns: {required}")
 
     saved_files = []
-    f_all = plot_dashboard(df, "All Groups", plots_dir / "BACalc_Combined_Palette.png")
+    f_all = plot_dashboard(df, "All Groups", plots_dir / "BACalc_Combined_Palette_unsigned.png")
     saved_files.append(f_all)
     log(f"Generated Dashboard: {f_all}")
 
@@ -187,7 +187,33 @@ def plot_ba_results(pred_csv: Path, out_dir: Path, log=print):
             sub = df[df["Group"] == g]
             if len(sub) >= 3:
                 tag = sanitize_for_filename(str(g))
-                f_g = plot_dashboard(sub, f"Group: {g}", plots_dir / f"BACalc_{tag}.png")
+                f_g = plot_dashboard(sub, f"Group: {g}", plots_dir / f"BACalc_{tag}_unsigned.png")
+                saved_files.append(f_g)
+    
+    return {"plots_dir": plots_dir, "files": saved_files}
+
+
+def plot_ba_results2(pred_csv: Path, out_dir: Path, log=print):
+    out_dir = Path(out_dir)
+    plots_dir = out_dir / "plots"
+    plots_dir.mkdir(parents=True, exist_ok=True)
+
+    df = pd.read_csv(pred_csv)
+    required = {"Age", "BAc", "BA_EC"}
+    if not required.issubset(df.columns):
+        raise ValueError(f"Predictions file lacks needed columns: {required}")
+
+    saved_files = []
+    f_all = plot_dashboard(df, "All Groups", plots_dir / "BACalc_Combined_Palette_signed.png")
+    saved_files.append(f_all)
+    log(f"Generated Dashboard: {f_all}")
+
+    if "Group" in df.columns:
+        for g in df["Group"].unique():
+            sub = df[df["Group"] == g]
+            if len(sub) >= 3:
+                tag = sanitize_for_filename(str(g))
+                f_g = plot_dashboard(sub, f"Group: {g}", plots_dir / f"BACalc_{tag}_signed.png")
                 saved_files.append(f_g)
     
     return {"plots_dir": plots_dir, "files": saved_files}
